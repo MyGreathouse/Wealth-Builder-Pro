@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wealth Builder Pro</title>
+<style>
+  :root {
+    --navy: #0B1830;
+    --navy-light: #16264a;
+    --gold: #F5A623;
+    --gold-soft: #fdf1dd;
+    --cream: #FBF8F2;
+    --green: #0f7a3d;
+    --ink: #1a1a2e;
+    --muted: #6a6f80;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+  }
+  h1, h2, h3, .serif { font-family: 'PT Serif', Georgia, serif; }
+
+  .header {
+    background: var(--navy);
+    color: #fff;
+    padding: 22px 28px;
+    text-align: center;
+  }
+  .header .pill {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .header p {
+    margin: 0 auto;
+    font-size: 13px;
+    color: #b9c6de;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+
+  .layout {
+    display: flex;
+    gap: 22px;
+    padding: 22px;
+    max-width: 1180px;
+    margin: 0 auto;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .panel {
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e7e1d2;
+    padding: 20px 22px;
+  }
+
+  .inputs-panel {
+    flex: 1 1 300px;
+    min-width: 280px;
+    position: sticky;
+    top: 22px;
+  }
+  .inputs-panel h2 {
+    font-size: 15px;
+    margin: 0 0 14px 0;
+    color: var(--navy);
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 8px;
+  }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 5px;
+  }
+  .field label .val {
+    font-family: 'PT Serif', Georgia, serif;
+    font-weight: 700;
+    color: var(--green);
+    font-size: 13.5px;
+  }
+  .field input[type="number"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1.5px solid #d8d0ba;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--ink);
+  }
+  .field select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1.5px solid #d8d0ba;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--ink);
+    background: #fff;
+    cursor: pointer;
+  }
+  .field select:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .field input[type="number"]:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .field input[type="range"] {
+    width: 100%;
+    accent-color: var(--gold);
+    margin-top: 6px;
+  }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gold-soft);
+    border: 1px solid #ecd8a8;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-top: 18px;
+  }
+  .toggle-row input { accent-color: var(--navy); width: 16px; height: 16px; }
+  .toggle-row label { font-size: 12px; color: var(--navy); font-weight: 600; line-height: 1.4; cursor: pointer; }
+
+  .target-block {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed #d8d0ba;
+  }
+  .target-block h3 {
+    font-size: 12.5px;
+    text-transform: none;
+    color: var(--navy);
+    margin: 0 0 10px 0;
+    font-family: inherit;
+    font-weight: 700;
+  }
+  .eta-result {
+    margin-top: 10px;
+    background: var(--navy);
+    color: #fff;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  .eta-result b { color: var(--gold); font-family: 'PT Serif', Georgia, serif; font-size: 14px; }
+
+  .results-panel {
+    flex: 2 1 560px;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .hero {
+    background: var(--navy);
+    color: #fff;
+    border-radius: 8px;
+    padding: 24px 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .hero .hero-label {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+  }
+  .hero .hero-value {
+    font-family: 'PT Serif', Georgia, serif;
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .hero .hero-sub { font-size: 12px; color: #b9c6de; margin-top: 6px; }
+  .hero-stats {
+    display: flex;
+    gap: 22px;
+  }
+  .hero-stats .stat { text-align: right; }
+  .hero-stats .stat .label { font-size: 10.5px; color: #9fb0cc; text-transform: uppercase; }
+  .hero-stats .stat .value { font-family: 'PT Serif', Georgia, serif; font-size: 16px; font-weight: 700; }
+
+  .stat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .stat-card {
+    background: #fff;
+    border: 1px solid #e7e1d2;
+    border-left: 4px solid var(--gold);
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .stat-card .label {
+    font-size: 10.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+  }
+  .stat-card .value {
+    font-family: 'PT Serif', Georgia, serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .stat-card.profit .value { color: var(--green); }
+
+  .chart-wrap {
+    background: #fff;
+    border: 1px solid #e7e1d2;
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .chart-wrap h3 {
+    font-size: 13px;
+    margin: 0 0 10px 0;
+    color: var(--navy);
+  }
+  .chart-canvas-box { position: relative; height: 260px; }
+  .chart-legend {
+    display: flex;
+    gap: 20px;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .chart-legend .swatch {
+    display: inline-block;
+    width: 16px;
+    height: 3px;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+  .swatch.navy-line { background: var(--navy); }
+  .swatch.gold-line { background: var(--gold); border-top: 2px dashed var(--gold); height: 0; }
+
+  table.milestones {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  table.milestones th {
+    background: var(--navy);
+    color: var(--gold);
+    padding: 8px 8px;
+    text-align: right;
+    font-size: 10.5px;
+    text-transform: uppercase;
+  }
+  table.milestones th:first-child { text-align: left; }
+  table.milestones td {
+    padding: 7px 8px;
+    border-bottom: 1px solid #ece7d9;
+    text-align: right;
+  }
+  table.milestones td:first-child { text-align: left; font-weight: 700; color: var(--navy); }
+  table.milestones tr:nth-child(even) td { background: var(--cream); }
+  table.milestones td.roi { color: var(--green); font-weight: 700; }
+
+  .note {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  /* ===== Progress tracker ===== */
+  .tracker-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .ts-card {
+    background: var(--cream);
+    border: 1px solid #e7e1d2;
+    border-left: 4px solid var(--navy);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .ts-card .label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+  }
+  .ts-card .value {
+    font-family: 'PT Serif', Georgia, serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .progress-bar-outer {
+    grid-column: 1 / -1;
+    background: #eee;
+    border-radius: 6px;
+    height: 12px;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), #e0901a);
+    width: 0%;
+    transition: width 0.25s ease;
+  }
+  .tracker-heading {
+    font-size: 13px;
+    margin: 0 0 8px 0;
+    color: var(--navy);
+    font-weight: 700;
+  }
+  .tracker-heading span { color: var(--green); }
+  .tick-note {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 12px;
+  }
+  table.tick-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9px;
+  }
+  table.tick-grid th {
+    background: var(--navy);
+    color: var(--gold);
+    padding: 4px 2px;
+    text-align: center;
+    font-size: 8.5px;
+    text-transform: uppercase;
+  }
+  table.tick-grid th.year-col { text-align: left; padding-left: 6px; }
+  table.tick-grid td {
+    border: 1px solid #ece7d9;
+    text-align: center;
+    padding: 2px 0;
+  }
+  table.tick-grid tr:nth-child(even) td { background: var(--cream); }
+  table.tick-grid td.year-cell {
+    font-weight: 700;
+    color: var(--navy);
+    text-align: left;
+    padding-left: 6px;
+    background: #eef1f6 !important;
+    font-size: 9px;
+  }
+  table.tick-grid td.jan-cell { background: #fdf1dd !important; }
+  .tick-box {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 1.2px solid var(--navy);
+    background: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.06s ease;
+  }
+  .tick-box:hover { border-color: var(--gold); transform: scale(1.15); }
+  .tick-box.ticked { background: var(--navy); }
+  .tick-box.ticked::after {
+    content: '';
+    position: absolute;
+    left: 2px; top: -1px;
+    width: 4px; height: 7px;
+    border: solid var(--gold);
+    border-width: 0 2px 2px 0;
+    transform: rotate(40deg);
+  }
+  td.jan-cell .tick-box.ticked { background: #b3781a; }
+  .inj-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 6px;
+  }
+  .inj-tick-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--cream);
+    border: 1px solid #ece7d9;
+    border-radius: 4px;
+    padding: 6px 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .inj-tick-box:hover { border-color: var(--gold); }
+  .inj-tick-box.ticked { background: var(--gold-soft); border-color: var(--gold); }
+  .inj-tick-box .tick-box { width: 13px; height: 13px; flex-shrink: 0; }
+  .inj-tick-box .inj-label { font-size: 9.5px; font-weight: 700; color: var(--navy); }
+  .tracker-head-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .reset-btn {
+    background: #fff;
+    border: 1.5px solid var(--navy);
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .reset-btn:hover { background: var(--navy); color: #fff; }
+
+  @media (max-width: 720px) {
+    .inputs-panel { position: static; }
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ts-card.projection {
+    background: var(--navy);
+    border-left-color: var(--gold);
+  }
+  .ts-card.projection .label { color: #9fb0cc; }
+  .ts-card.projection .value { color: #fff; }
+
+  .live-projection {
+    background: var(--gold-soft);
+    border: 1.5px solid var(--gold);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .lp-empty {
+    font-size: 12px;
+    color: var(--navy);
+    font-style: italic;
+  }
+  .lp-row {
+    font-size: 12px;
+    color: var(--ink);
+    line-height: 1.6;
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 6px;
+  }
+  .lp-row:last-child { margin-bottom: 0; }
+  .lp-icon {
+    position: absolute;
+    left: 0;
+    top: 1px;
+    color: var(--gold);
+    font-size: 7px;
+  }
+  .lp-row b { color: var(--navy); font-family: 'PT Serif', Georgia, serif; }
+  .lp-row .ahead { color: var(--green); }
+  .lp-row .behind { color: #b3401a; }
+  .lp-target-row { font-weight: 600; }
+  .table-scroll-hint {
+    display: none;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  /* ===================== MOBILE ===================== */
+  @media (max-width: 640px) {
+    html, body { overflow-x: hidden; }
+
+    .header { padding: 16px 16px; }
+    .header h1 { font-size: 18px; }
+    .header p { font-size: 12px; }
+    .header .pill { font-size: 9.5px; padding: 3px 10px; }
+
+    .layout { padding: 12px; gap: 14px; }
+    .panel { padding: 16px; }
+
+    .inputs-panel { position: static; order: 1; }
+    .results-panel { order: 2; }
+
+    .field input[type="number"] {
+      font-size: 16px; /* prevents iOS auto-zoom on focus */
+      padding: 10px 12px;
+    }
+    .field input[type="range"] { height: 28px; }
+    .toggle-row label { font-size: 12.5px; }
+
+    .hero {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 18px 18px;
+    }
+    .hero-value { font-size: 27px; word-break: break-word; }
+    .hero-stats {
+      width: 100%;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .hero-stats .stat { text-align: left; }
+
+    .stat-cards { grid-template-columns: repeat(2, 1fr); }
+    .stat-card .value { font-size: 15px; }
+
+    .chart-canvas-box { height: 210px; }
+    .chart-wrap { padding: 14px; }
+
+    table.milestones { font-size: 10.5px; }
+    table.milestones th, table.milestones td { padding: 6px 5px; }
+
+    /* Tracker: bigger tap targets, still horizontally scrollable */
+    table.tick-grid { font-size: 10.5px; }
+    table.tick-grid td { padding: 5px 1px; }
+    table.tick-grid th { padding: 6px 2px; font-size: 9.5px; }
+    .tick-box { width: 17px; height: 17px; border-radius: 4px; }
+    .tick-box.ticked::after { left: 4px; top: 1px; width: 5px; height: 9px; }
+
+    .inj-grid { grid-template-columns: repeat(2, 1fr); }
+    .inj-tick-box { padding: 9px 10px; }
+    .inj-tick-box .tick-box { width: 18px; height: 18px; }
+    .inj-tick-box .inj-label { font-size: 11px; }
+
+    .tracker-summary { grid-template-columns: 1fr 1fr; }
+    .ts-card .value { font-size: 14px; }
+
+    .tracker-head-row { flex-wrap: wrap; gap: 10px; }
+    .reset-btn { padding: 8px 14px; font-size: 12px; }
+    .table-scroll-hint { display: block; }
+  }
+
+  @media (max-width: 400px) {
+    .stat-cards { grid-template-columns: 1fr 1fr; }
+    .hero-value { font-size: 23px; }
+    .inj-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="pill">Master Plan &middot; Interactive Calculator</div>
+  <h1>Wealth Builder Pro</h1>
+  <p>Enter your own monthly savings, annual January injection, interest rate and timeline &mdash; every figure below recalculates instantly. Every projection only counts boxes you've actually ticked for months already reached; the future still assumes the plan continues.</p>
+</div>
+
+<div class="layout">
+
+  <div class="panel inputs-panel">
+    <div class="tracker-head-row" style="margin-bottom:14px; border-bottom:2px solid var(--gold); padding-bottom:8px;">
+      <h2 style="margin:0; border:none; padding:0;">Your Inputs</h2>
+      <button class="reset-btn" id="reset-inputs">Reset to Defaults</button>
+    </div>
+
+    <div class="field">
+      <label>Base Currency</label>
+      <select id="in-currency">
+        <option value="NGN">&#8358; NGN &mdash; Nigerian Naira</option>
+        <option value="USD">$ USD &mdash; US Dollar</option>
+        <option value="GBP">&#163; GBP &mdash; British Pound</option>
+        <option value="EUR">&#8364; EUR &mdash; Euro</option>
+        <option value="GHS">&#8373; GHS &mdash; Ghanaian Cedi</option>
+        <option value="ZAR">R ZAR &mdash; South African Rand</option>
+        <option value="KES">KSh KES &mdash; Kenyan Shilling</option>
+        <option value="INR">&#8377; INR &mdash; Indian Rupee</option>
+        <option value="CAD">C$ CAD &mdash; Canadian Dollar</option>
+        <option value="AUD">A$ AUD &mdash; Australian Dollar</option>
+      </select>
+      <div class="note" style="margin-top:6px;">Changes only the symbol and label &mdash; amounts you enter are treated as already being in this currency (no exchange-rate conversion).</div>
+    </div>
+
+    <div class="field">
+      <label>Monthly Savings <span class="val" id="v-monthly">&#8358;200,000</span></label>
+      <input type="number" id="in-monthly" value="200000" step="10000" min="0">
+      <input type="range" id="sl-monthly" value="200000" step="10000" min="0" max="2000000">
+    </div>
+
+    <div class="field">
+      <label>Annual January Injection <span class="val" id="v-injection">&#8358;5,000,000</span></label>
+      <input type="number" id="in-injection" value="5000000" step="100000" min="0">
+      <input type="range" id="sl-injection" value="5000000" step="100000" min="0" max="20000000">
+    </div>
+
+    <div class="field">
+      <label>Interest Rate (p.a., compounded monthly) <span class="val" id="v-rate">15.0%</span></label>
+      <input type="number" id="in-rate" value="15" step="0.1" min="0" max="50">
+      <input type="range" id="sl-rate" value="15" step="0.1" min="0" max="40">
+    </div>
+
+    <div class="field">
+      <label>Time Horizon (Years) <span class="val" id="v-years">30</span></label>
+      <input type="number" id="in-years" value="30" step="1" min="1" max="45">
+      <input type="range" id="sl-years" value="30" step="1" min="1" max="45">
+    </div>
+
+    <div class="toggle-row">
+      <input type="checkbox" id="in-wht">
+      <label for="in-wht">Apply Nigeria's 10% Withholding Tax (WHT) to interest earned &mdash; shows your realistic net figure</label>
+    </div>
+
+    <div class="target-block">
+      <h3>Optional: Target a specific balance</h3>
+      <div class="field" style="margin-bottom:0;">
+        <label>Target Balance <span class="val" id="v-target">&#8358;1,000,000,000</span></label>
+        <input type="number" id="in-target" value="1000000000" step="1000000" min="0">
+      </div>
+      <div class="eta-result" id="eta-box">Enter a target above to see how long it takes to reach it.</div>
+    </div>
+  </div>
+
+  <div class="results-panel">
+
+    <div class="hero">
+      <div>
+        <div class="hero-label">Final Projected Balance</div>
+        <div class="hero-value" id="hero-balance">&#8358;0</div>
+        <div class="hero-sub" id="hero-sub">after 30 years, gross of tax</div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="label">Total Invested</div>
+          <div class="value" id="hero-principal">&#8358;0</div>
+        </div>
+        <div class="stat">
+          <div class="label">ROI</div>
+          <div class="value" id="hero-roi">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="label">Monthly Deposits Total</div>
+        <div class="value" id="card-monthly-total">&#8358;0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">January Injections Total</div>
+        <div class="value" id="card-injection-total">&#8358;0</div>
+      </div>
+      <div class="stat-card profit">
+        <div class="label">Net Profit</div>
+        <div class="value" id="card-profit">&#8358;0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total Months</div>
+        <div class="value" id="card-months">0</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <h3>Balance Growth Over Time</h3>
+      <div class="chart-canvas-box" id="chartBox"></div>
+      <div class="chart-legend">
+        <span><span class="swatch navy-line"></span> Projected Balance</span>
+        <span><span class="swatch gold-line"></span> Total Capital Contributed</span>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <h3>Milestone Breakdown</h3>
+      <div class="table-scroll-hint">Swipe sideways to see all columns &rarr;</div>
+      <div class="table-scroll">
+        <table class="milestones" id="milestone-table">
+          <thead>
+            <tr>
+              <th style="text-align:left;">Milestone</th>
+              <th>Months</th>
+              <th>Total Principal</th>
+              <th>Projected Balance</th>
+              <th>Net Profit</th>
+              <th>ROI %</th>
+            </tr>
+          </thead>
+          <tbody id="milestone-body"></tbody>
+        </table>
+      </div>
+      <div class="note">Milestones shown every 5 years, plus the final year. Months you've already ticked count only what's actually been paid in; months beyond your current progress assume the plan continues as scheduled. Toggle WHT above to see net-of-tax figures throughout.</div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="tracker-head-row">
+        <h3 style="margin:0;">Your Savings &amp; Injection Tracker</h3>
+        <button class="reset-btn" id="reset-tracker">Reset All Ticks</button>
+      </div>
+      <div class="tracker-summary">
+        <div class="ts-card">
+          <div class="label">Ticked So Far</div>
+          <div class="value" id="ts-saved">&#8358;0</div>
+        </div>
+        <div class="ts-card">
+          <div class="label">Plan Total (Principal)</div>
+          <div class="value" id="ts-plan-total">&#8358;0</div>
+        </div>
+        <div class="ts-card">
+          <div class="label">Progress</div>
+          <div class="value" id="ts-pct">0%</div>
+        </div>
+        <div class="ts-card projection">
+          <div class="label">Projected Final (Your Pace)</div>
+          <div class="value" id="ts-projected-final">&#8358;0</div>
+        </div>
+        <div class="progress-bar-outer"><div class="progress-bar-inner" id="ts-bar"></div></div>
+      </div>
+
+      <div class="live-projection" id="live-projection">
+        <div class="lp-empty" id="lp-empty">Tick your first box below to see your live projection here &mdash; it recalculates automatically every time you tick or untick a payment.</div>
+        <div class="lp-content" id="lp-content" style="display:none;">
+          <div class="lp-row" id="lp-row-progress"></div>
+          <div class="lp-row" id="lp-row-variance"></div>
+          <div class="lp-row" id="lp-row-final"></div>
+          <div class="lp-row lp-target-row" id="lp-row-target"></div>
+        </div>
+      </div>
+
+      <h4 class="tracker-heading">Monthly Savings Tracker &mdash; <span id="box-value-monthly">&#8358;200,000</span> per box</h4>
+      <div class="table-scroll">
+        <table class="tick-grid" id="monthly-grid">
+          <thead>
+            <tr>
+              <th class="year-col">Year</th>
+              <th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th>
+              <th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th>
+            </tr>
+          </thead>
+          <tbody id="monthly-grid-body"></tbody>
+        </table>
+      </div>
+
+      <h4 class="tracker-heading" style="margin-top:18px;">January Injection Tracker &mdash; <span id="box-value-injection">&#8358;5,000,000</span> per box</h4>
+      <div class="inj-grid" id="injection-grid-body"></div>
+
+      <div class="tick-note">Tick a box the moment that deposit clears in real life. Every input on this page &mdash; your ticks, currency, monthly amount, injection, rate, years, WHT toggle and target &mdash; is saved automatically and restored the next time you open this tool, until you use one of the Reset buttons above.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const CURRENCY_SYMBOLS = {
+  NGN: '\u20A6', USD: '$', GBP: '\u00A3', EUR: '\u20AC', GHS: '\u20B5',
+  ZAR: 'R', KES: 'KSh', INR: '\u20B9', CAD: 'C$', AUD: 'A$'
+};
+let curCurrencySymbol = CURRENCY_SYMBOLS.NGN;
+
+function nairaFmt(n, decimals) {
+  decimals = decimals || 0;
+  const sign = n < 0 ? '-' : '';
+  n = Math.abs(n);
+  return sign + curCurrencySymbol + n.toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
+}
+
+// "Elapsed months" = how many deposits you've actually ticked, full stop. It is NOT the
+// calendar position of the furthest box you've clicked - ticking "September" as your very
+// first payment means you've made ONE deposit, not that eight months silently happened
+// before it. Each tick simply adds one more completed month to your real progress, in the
+// order you make them - independent of which specific calendar box you happened to tick.
+function computeElapsedMonths(totalMonths) {
+  return Math.min(totalMonths, tickedMonths.size);
+}
+
+// Main plan simulation: your first `elapsedMonths` months are your REAL progress - every one
+// of them is a genuine ticked deposit, front-loaded from the start of the plan (ticked boxes
+// are counted, not positioned). Ticked January injections are placed at the start of each of
+// those months in turn, up to however many you've actually ticked. Beyond that point (the
+// future, which can't be ticked yet) the plan's scheduled deposits are assumed, since a
+// forward projection has to assume *something* continues. With zero ticks, elapsedMonths is 0
+// and this is identical to a full-schedule projection.
+function simulate(monthly, annualInjection, ratePercent, years, applyWHT) {
+  const monthlyRate = (ratePercent / 100) / 12;
+  let balance = 0;
+  let principal = 0;
+  let monthlyTotal = 0;
+  let injectionTotal = 0;
+  const totalMonths = years * 12;
+  const elapsedMonths = computeElapsedMonths(totalMonths);
+  const injectionTicksAvailable = tickedYears.size;
+  let injectionsPlaced = 0;
+  const series = []; // {month, year, balance, principal}
+
+  for (let month = 1; month <= totalMonths; month++) {
+    const year = Math.ceil(month / 12);
+    const monthInYear = ((month - 1) % 12) + 1;
+    let deposit = 0;
+
+    if (month <= elapsedMonths) {
+      // Your real progress so far: this month IS one of your ticks, by definition.
+      deposit += monthly; monthlyTotal += monthly;
+      if (monthInYear === 1 && injectionsPlaced < injectionTicksAvailable) {
+        deposit += annualInjection; injectionTotal += annualInjection; injectionsPlaced++;
+      }
+    } else {
+      // Future: not yet reachable to tick, so the plan's schedule is assumed to continue.
+      deposit += monthly; monthlyTotal += monthly;
+      if (monthInYear === 1) { deposit += annualInjection; injectionTotal += annualInjection; }
+    }
+
+    balance += deposit;
+    principal += deposit;
+
+    const interest = balance * monthlyRate;
+    const netInterest = applyWHT ? interest * 0.9 : interest;
+    balance += netInterest;
+
+    if (monthInYear === 12) {
+      series.push({ month, year, balance, principal });
+    }
+  }
+
+  return { series, principal, balance, monthlyTotal, injectionTotal, totalMonths, elapsedMonths };
+}
+
+// Same ticked-count-based logic as simulate(), applied to the ETA search.
+function findETA(monthly, annualInjection, ratePercent, applyWHT, target) {
+  const monthlyRate = (ratePercent / 100) / 12;
+  let balance = 0;
+  const elapsedMonths = computeElapsedMonths(curTotalMonths);
+  const injectionTicksAvailable = tickedYears.size;
+  let injectionsPlaced = 0;
+  const maxMonths = 900; // 75 years safety cap
+  for (let month = 1; month <= maxMonths; month++) {
+    const monthInYear = ((month - 1) % 12) + 1;
+    let deposit = monthly;
+    if (month <= elapsedMonths) {
+      if (monthInYear === 1 && injectionsPlaced < injectionTicksAvailable) { deposit += annualInjection; injectionsPlaced++; }
+    } else {
+      if (monthInYear === 1) deposit += annualInjection;
+    }
+    balance += deposit;
+    const interest = balance * monthlyRate;
+    balance += applyWHT ? interest * 0.9 : interest;
+    if (balance >= target) {
+      return { months: month, years: Math.floor(month / 12), remMonths: month % 12 };
+    }
+  }
+  return null;
+}
+
+// ---- Live Progress Projection helpers (based on actually ticked boxes) ----
+
+// Balance built ONLY from your actual ticks, front-loaded into the first `uptoMonth` months
+// (ticked boxes are counted, not positioned - see computeElapsedMonths above). Ticked
+// injections are placed at the start of each of those months in turn.
+function simulateActual(monthly, injection, ratePercent, uptoMonth, applyWHT) {
+  const monthlyRate = (ratePercent / 100) / 12;
+  let balance = 0, principal = 0;
+  const injectionTicksAvailable = tickedYears.size;
+  let injectionsPlaced = 0;
+  for (let month = 1; month <= uptoMonth; month++) {
+    const monthInYear = ((month - 1) % 12) + 1;
+    let deposit = monthly;
+    if (monthInYear === 1 && injectionsPlaced < injectionTicksAvailable) {
+      deposit += injection;
+      injectionsPlaced++;
+    }
+    balance += deposit;
+    principal += deposit;
+    const interest = balance * monthlyRate;
+    balance += applyWHT ? interest * 0.9 : interest;
+  }
+  return { balance, principal };
+}
+
+// Full-compliance balance for exactly `totalMonths` months (no ticks needed) - used as the
+// "expected if fully on schedule" comparison at the same elapsed point.
+function simulateFullMonths(monthly, injection, ratePercent, totalMonths, applyWHT) {
+  const monthlyRate = (ratePercent / 100) / 12;
+  let balance = 0, principal = 0;
+  for (let month = 1; month <= totalMonths; month++) {
+    const monthInYear = ((month - 1) % 12) + 1;
+    let deposit = monthly;
+    if (monthInYear === 1) deposit += injection;
+    balance += deposit;
+    principal += deposit;
+    const interest = balance * monthlyRate;
+    balance += applyWHT ? interest * 0.9 : interest;
+  }
+  return { balance, principal };
+}
+
+// Continue from an actual balance at `fromMonth`, assuming full scheduled deposits resume
+// for every month after that, through to `toMonth`.
+function projectForward(startBalance, monthly, injection, ratePercent, fromMonth, toMonth, applyWHT) {
+  const monthlyRate = (ratePercent / 100) / 12;
+  let balance = startBalance;
+  for (let month = fromMonth + 1; month <= toMonth; month++) {
+    const monthInYear = ((month - 1) % 12) + 1;
+    let deposit = monthly;
+    if (monthInYear === 1) deposit += injection;
+    balance += deposit;
+    const interest = balance * monthlyRate;
+    balance += applyWHT ? interest * 0.9 : interest;
+  }
+  return balance;
+}
+
+// Like findETA, but starting from a real balance at a real point in time (fromMonth),
+// continuing with full scheduled deposits.
+function findETAFromPoint(startBalance, monthly, injection, ratePercent, applyWHT, target, fromMonth) {
+  const monthlyRate = (ratePercent / 100) / 12;
+  let balance = startBalance;
+  const maxMonths = fromMonth + 900;
+  for (let month = fromMonth + 1; month <= maxMonths; month++) {
+    const monthInYear = ((month - 1) % 12) + 1;
+    let deposit = monthly;
+    if (monthInYear === 1) deposit += injection;
+    balance += deposit;
+    const interest = balance * monthlyRate;
+    balance += applyWHT ? interest * 0.9 : interest;
+    if (balance >= target) {
+      const extra = month - fromMonth;
+      return { totalMonth: month, extraMonths: extra, years: Math.floor(extra / 12), remMonths: extra % 12 };
+    }
+  }
+  return null;
+}
+
+function drawChart(series) {
+  const box = document.getElementById('chartBox');
+  const width = box.clientWidth || 600;
+  const height = box.clientHeight || 260;
+  const padL = 62, padR = 14, padT = 14, padB = 28;
+  const plotW = width - padL - padR;
+  const plotH = height - padT - padB;
+
+  const maxBalance = Math.max(...series.map(s => s.balance), 1);
+  const n = series.length;
+
+  function xAt(i) { return padL + (n === 1 ? 0 : (i / (n - 1)) * plotW); }
+  function yAt(v) { return padT + plotH - (v / maxBalance) * plotH; }
+
+  function pathFor(key) {
+    return series.map((s, i) => `${i === 0 ? 'M' : 'L'} ${xAt(i).toFixed(1)} ${yAt(s[key]).toFixed(1)}`).join(' ');
+  }
+
+  const balancePath = pathFor('balance');
+  const principalPath = pathFor('principal');
+  const areaPath = balancePath + ` L ${xAt(n-1).toFixed(1)} ${yAt(0).toFixed(1)} L ${xAt(0).toFixed(1)} ${yAt(0).toFixed(1)} Z`;
+
+  // Y-axis gridlines / labels (5 steps)
+  const steps = 5;
+  let gridLines = '';
+  for (let i = 0; i <= steps; i++) {
+    const v = (maxBalance / steps) * i;
+    const y = yAt(v);
+    gridLines += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${width - padR}" y2="${y.toFixed(1)}" stroke="#eee" stroke-width="1"/>`;
+    gridLines += `<text x="${padL - 8}" y="${(y + 3).toFixed(1)}" text-anchor="end" font-size="9.5" fill="#8a8f9c">${fmtM(v)}</text>`;
+  }
+
+  // X-axis labels (subset)
+  const labelEvery = Math.max(1, Math.ceil(n / 8));
+  let xLabels = '';
+  series.forEach((s, i) => {
+    if (i % labelEvery === 0 || i === n - 1) {
+      xLabels += `<text x="${xAt(i).toFixed(1)}" y="${height - 8}" text-anchor="middle" font-size="9.5" fill="#8a8f9c">Y${s.year}</text>`;
+    }
+  });
+
+  box.innerHTML = `
+    <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="overflow:visible;">
+      ${gridLines}
+      <path d="${areaPath}" fill="rgba(11,24,48,0.07)" stroke="none"/>
+      <path d="${principalPath}" fill="none" stroke="#F5A623" stroke-width="2" stroke-dasharray="5,4"/>
+      <path d="${balancePath}" fill="none" stroke="#0B1830" stroke-width="2.5"/>
+      ${xLabels}
+    </svg>
+  `;
+}
+
+function fmtM(v) {
+  if (v >= 1e9) return curCurrencySymbol + (v/1e9).toFixed(1) + 'B';
+  if (v >= 1e6) return curCurrencySymbol + (v/1e6).toFixed(0) + 'M';
+  if (v >= 1e3) return curCurrencySymbol + (v/1e3).toFixed(0) + 'k';
+  return curCurrencySymbol + v.toFixed(0);
+}
+
+let chart = null;
+let lastSeries = null;
+
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { if (lastSeries) drawChart(lastSeries); }, 150);
+});
+
+function render() {
+  const currencyCode = document.getElementById('in-currency').value;
+  curCurrencySymbol = CURRENCY_SYMBOLS[currencyCode] || CURRENCY_SYMBOLS.NGN;
+
+  const monthly = parseFloat(document.getElementById('in-monthly').value) || 0;
+  const injection = parseFloat(document.getElementById('in-injection').value) || 0;
+  const rate = parseFloat(document.getElementById('in-rate').value) || 0;
+  const years = parseInt(document.getElementById('in-years').value) || 1;
+  const applyWHT = document.getElementById('in-wht').checked;
+  const target = parseFloat(document.getElementById('in-target').value) || 0;
+
+  document.getElementById('v-monthly').textContent = nairaFmt(monthly);
+  document.getElementById('v-injection').textContent = nairaFmt(injection);
+  document.getElementById('v-rate').textContent = rate.toFixed(1) + '%';
+  document.getElementById('v-years').textContent = years;
+  document.getElementById('v-target').textContent = nairaFmt(target);
+
+  document.getElementById('sl-monthly').value = monthly;
+  document.getElementById('sl-injection').value = injection;
+  document.getElementById('sl-rate').value = rate;
+  document.getElementById('sl-years').value = years;
+
+  const result = simulate(monthly, injection, rate, years, applyWHT);
+  const profit = result.balance - result.principal;
+  const roi = result.principal > 0 ? (profit / result.principal) * 100 : 0;
+
+  document.getElementById('hero-balance').textContent = nairaFmt(result.balance);
+  document.getElementById('hero-sub').textContent =
+    `after ${years} year${years === 1 ? '' : 's'}, ${applyWHT ? 'net of 10% WHT' : 'gross of tax'}` +
+    (result.elapsedMonths > 0 ? ` \u2014 based on ${result.elapsedMonths} ticked month${result.elapsedMonths === 1 ? '' : 's'} so far, plan continuing after` : ' \u2014 no boxes ticked yet, full plan assumed');
+  document.getElementById('hero-principal').textContent = nairaFmt(result.principal);
+  document.getElementById('hero-roi').textContent = roi.toFixed(1) + '%';
+
+  document.getElementById('card-monthly-total').textContent = nairaFmt(result.monthlyTotal);
+  document.getElementById('card-injection-total').textContent = nairaFmt(result.injectionTotal);
+  document.getElementById('card-profit').textContent = nairaFmt(profit);
+  document.getElementById('card-months').textContent = result.totalMonths.toLocaleString('en-US');
+
+  // Milestone table: every 5 years + final year
+  const tbody = document.getElementById('milestone-body');
+  tbody.innerHTML = '';
+  const milestoneYears = [];
+  for (let y = 5; y < years; y += 5) milestoneYears.push(y);
+  if (!milestoneYears.includes(years)) milestoneYears.push(years);
+
+  milestoneYears.forEach(y => {
+    const point = result.series.find(s => s.year === y);
+    if (!point) return;
+    const p = point.principal;
+    const b = point.balance;
+    const pr = b - p;
+    const r = p > 0 ? (pr / p) * 100 : 0;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>Year ${y}</td>
+      <td style="text-align:right;">${y * 12}</td>
+      <td style="text-align:right;">${nairaFmt(p)}</td>
+      <td style="text-align:right;">${nairaFmt(b)}</td>
+      <td style="text-align:right;">${nairaFmt(pr)}</td>
+      <td style="text-align:right;" class="roi">${r.toFixed(1)}%</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Chart (self-contained SVG, no external dependency)
+  lastSeries = result.series;
+  drawChart(result.series);
+
+  // Progress tracker: keep grid sized to plan, and refresh totals
+  curMonthly = monthly;
+  curInjection = injection;
+  curPlanTotal = result.principal;
+  curTotalMonths = result.totalMonths;
+  curYears = years;
+  curRate = rate;
+  curApplyWHT = applyWHT;
+  curTarget = target;
+  ensureGrids(years);
+  updateProgress();
+
+  // ETA
+  const etaBox = document.getElementById('eta-box');
+  if (target > 0) {
+    const eta = findETA(monthly, injection, rate, applyWHT, target);
+    if (eta) {
+      etaBox.innerHTML = `At this rate, you'll reach <b>${nairaFmt(target)}</b> in <b>${eta.years} years, ${eta.remMonths} months</b> (${eta.months} months total).`;
+    } else {
+      etaBox.innerHTML = `This target isn't reached within 75 years at the current inputs &mdash; try a higher monthly amount, injection, or rate.`;
+    }
+  } else {
+    etaBox.textContent = 'Enter a target above to see how long it takes to reach it.';
+  }
+}
+
+// ===== Progress Tracker =====
+const tickedMonths = new Set();
+const tickedYears = new Set();
+let lastGridYears = null;
+let curMonthly = 0, curInjection = 0, curPlanTotal = 0, curTotalMonths = 0, curYears = 0, curRate = 0, curApplyWHT = false, curTarget = 0;
+
+function buildMonthlyGrid(years) {
+  let rows = '';
+  for (let y = 1; y <= years; y++) {
+    let cells = '';
+    for (let mi = 0; mi < 12; mi++) {
+      const absMonth = (y - 1) * 12 + mi + 1;
+      const janClass = mi === 0 ? ' jan-cell' : '';
+      cells += `<td class="chk-cell${janClass}" data-month="${absMonth}"><span class="tick-box"></span></td>`;
+    }
+    rows += `<tr><td class="year-cell">Y${y}</td>${cells}</tr>`;
+  }
+  document.getElementById('monthly-grid-body').innerHTML = rows;
+}
+
+function buildInjectionGrid(years) {
+  let boxes = '';
+  for (let y = 1; y <= years; y++) {
+    boxes += `<div class="inj-tick-box" data-year="${y}"><span class="tick-box"></span><span class="inj-label">Year ${y}</span></div>`;
+  }
+  document.getElementById('injection-grid-body').innerHTML = boxes;
+}
+
+function applyTickedClasses() {
+  document.querySelectorAll('#monthly-grid-body td.chk-cell').forEach(td => {
+    const m = parseInt(td.dataset.month);
+    const tb = td.querySelector('.tick-box');
+    tb.classList.toggle('ticked', tickedMonths.has(m));
+  });
+  document.querySelectorAll('#injection-grid-body .inj-tick-box').forEach(box => {
+    const y = parseInt(box.dataset.year);
+    const tb = box.querySelector('.tick-box');
+    const isTicked = tickedYears.has(y);
+    box.classList.toggle('ticked', isTicked);
+    tb.classList.toggle('ticked', isTicked);
+  });
+}
+
+function ensureGrids(years) {
+  if (years !== lastGridYears) {
+    buildMonthlyGrid(years);
+    buildInjectionGrid(years);
+    lastGridYears = years;
+  }
+  applyTickedClasses();
+}
+
+function updateProgress() {
+  const actualMonths = [...tickedMonths].filter(m => m <= curTotalMonths).length;
+  const actualYears = [...tickedYears].filter(y => y <= curYears).length;
+  const actual = actualMonths * curMonthly + actualYears * curInjection;
+  const pct = curPlanTotal > 0 ? Math.min(100, (actual / curPlanTotal) * 100) : 0;
+
+  document.getElementById('ts-saved').textContent = nairaFmt(actual);
+  document.getElementById('ts-plan-total').textContent = nairaFmt(curPlanTotal);
+  document.getElementById('ts-pct').textContent = pct.toFixed(1) + '%';
+  document.getElementById('ts-bar').style.width = pct.toFixed(1) + '%';
+  document.getElementById('box-value-monthly').textContent = nairaFmt(curMonthly);
+  document.getElementById('box-value-injection').textContent = nairaFmt(curInjection);
+
+  updateLiveProjection();
+}
+
+// Pro-rata = what contributions actually give BY THE END OF THE FISCAL YEAR, compounding
+// forward at the plan's interest rate, always net of Nigeria's 10% WHT on interest
+// (this is a fixed feature of the calculation, independent of the WHT toggle elsewhere).
+function getFiscalYearProration(monthly, injection, ratePercent, elapsedMonths, actualBalance) {
+  const fiscalYear = Math.ceil(elapsedMonths / 12);
+  const yearStartMonth = (fiscalYear - 1) * 12;
+  const yearEndMonth = fiscalYear * 12;
+  const monthsIntoYear = elapsedMonths - yearStartMonth;
+
+  // Full-schedule target for this fiscal year: every month's contribution, compounded
+  // forward to this year's end, net of 10% WHT.
+  const yearEndTarget = simulateFullMonths(monthly, injection, ratePercent, yearEndMonth, true).balance;
+
+  // Your real trajectory: your actual ticked balance right now, with the plan's remaining
+  // scheduled contributions for the rest of THIS fiscal year, compounded to year-end,
+  // net of 10% WHT.
+  const yourTrajectory = projectForward(actualBalance, monthly, injection, ratePercent, elapsedMonths, yearEndMonth, true);
+
+  return { fiscalYear, monthsIntoYear, yearEndMonth, yearEndTarget, yourTrajectory };
+}
+
+function updateLiveProjection() {
+  const emptyEl = document.getElementById('lp-empty');
+  const contentEl = document.getElementById('lp-content');
+
+  // "Now" = how many deposits you've actually ticked (a count, not a calendar position).
+  const elapsedMonths = computeElapsedMonths(curTotalMonths);
+
+  if (elapsedMonths === 0) {
+    emptyEl.style.display = 'block';
+    contentEl.style.display = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  contentEl.style.display = 'block';
+
+  const actualNow = simulateActual(curMonthly, curInjection, curRate, elapsedMonths, curApplyWHT);
+
+  // The fiscal-year pro-rata figure always deducts 10% WHT, independent of the toggle above,
+  // so it needs its own self-consistent "actual so far" computed the same way.
+  const actualNowNetWHT = simulateActual(curMonthly, curInjection, curRate, elapsedMonths, true);
+  const fy = getFiscalYearProration(curMonthly, curInjection, curRate, elapsedMonths, actualNowNetWHT.balance);
+  const variance = fy.yourTrajectory - fy.yearEndTarget;
+  const aheadOrBehind = variance >= 0 ? 'ahead of' : 'behind';
+  const varianceAbs = Math.abs(variance);
+
+  const projectedFinal = projectForward(actualNow.balance, curMonthly, curInjection, curRate, elapsedMonths, curTotalMonths, curApplyWHT);
+
+  const pctDone = curTotalMonths > 0 ? ((elapsedMonths / curTotalMonths) * 100).toFixed(1) : '0.0';
+
+  document.getElementById('ts-projected-final').textContent = nairaFmt(projectedFinal);
+
+  document.getElementById('lp-row-progress').innerHTML =
+    `<span class="lp-icon">&#9679;</span>You've completed <b>${elapsedMonths}</b> of <b>${curTotalMonths}</b> months (<b>${pctDone}%</b> of the timeline) &mdash; ` +
+    `Month <b>${fy.monthsIntoYear}</b> of 12 in <b>Fiscal Year ${fy.fiscalYear}</b>.`;
+
+  document.getElementById('lp-row-variance').innerHTML =
+    `<span class="lp-icon">&#9679;</span>Pro-rata for Fiscal Year ${fy.fiscalYear}: contributions made so far, plus what's still scheduled this year, compounded to year-end at ${curRate.toFixed(1)}% net of 10% WHT, put you on track for <b>${nairaFmt(fy.yourTrajectory)}</b> ` +
+    `&mdash; against a full-schedule target of <b>${nairaFmt(fy.yearEndTarget)}</b> for Fiscal Year ${fy.fiscalYear}, that's ` +
+    `<b class="${variance >= 0 ? 'ahead' : 'behind'}">${nairaFmt(varianceAbs)} ${aheadOrBehind}</b> target.`;
+
+  document.getElementById('lp-row-final').innerHTML =
+    `<span class="lp-icon">&#9679;</span>Resume full payments from here and you're projected to finish with <b>${nairaFmt(projectedFinal)}</b> by Year ${curYears}.`;
+
+  const targetRow = document.getElementById('lp-row-target');
+  if (curTarget > 0) {
+    if (actualNow.balance >= curTarget) {
+      targetRow.innerHTML = `<span class="lp-icon">&#9679;</span><span class="ahead">You've already reached your ${nairaFmt(curTarget)} target &mdash; ${nairaFmt(actualNow.balance - curTarget)} past it.</span>`;
+    } else {
+      const eta = findETAFromPoint(actualNow.balance, curMonthly, curInjection, curRate, curApplyWHT, curTarget, elapsedMonths);
+      if (eta) {
+        targetRow.innerHTML = `<span class="lp-icon">&#9679;</span>At this pace, you'll reach <b>${nairaFmt(curTarget)}</b> in <b>${eta.years} years, ${eta.remMonths} months</b> from now (month ${eta.totalMonth} overall).`;
+      } else {
+        targetRow.innerHTML = `<span class="lp-icon">&#9679;</span>Your <b>${nairaFmt(curTarget)}</b> target isn't reached within a reasonable horizon at this pace &mdash; consider catching up missed ticks or increasing your monthly amount.`;
+      }
+    }
+  } else {
+    targetRow.innerHTML = `<span class="lp-icon">&#9679;</span>Set a target balance in the sidebar to see when you'll reach it at this pace.`;
+  }
+}
+
+async function saveTickState() {
+  try {
+    if (window.storage) {
+      await window.storage.set('wealth-tracker-ticks', JSON.stringify({
+        months: [...tickedMonths], years: [...tickedYears]
+      }), false);
+    }
+  } catch (e) { /* storage unavailable or write refused - continue silently */ }
+}
+
+async function loadTickState() {
+  try {
+    if (window.storage) {
+      const res = await window.storage.get('wealth-tracker-ticks', false);
+      if (res && res.value) {
+        const parsed = JSON.parse(res.value);
+        (parsed.months || []).forEach(m => tickedMonths.add(m));
+        (parsed.years || []).forEach(y => tickedYears.add(y));
+      }
+    }
+  } catch (e) { /* no saved state yet, or storage unavailable */ }
+}
+
+// ===== Persist the input panel itself (currency, monthly, injection, rate, years, WHT, target) =====
+const DEFAULT_INPUTS = {
+  currency: 'NGN', monthly: 200000, injection: 5000000, rate: 15, years: 30, wht: false, target: 1000000000
+};
+
+function readInputsFromDOM() {
+  return {
+    currency: document.getElementById('in-currency').value,
+    monthly: document.getElementById('in-monthly').value,
+    injection: document.getElementById('in-injection').value,
+    rate: document.getElementById('in-rate').value,
+    years: document.getElementById('in-years').value,
+    wht: document.getElementById('in-wht').checked,
+    target: document.getElementById('in-target').value
+  };
+}
+
+function applyInputsToDOM(vals) {
+  document.getElementById('in-currency').value = vals.currency || 'NGN';
+  document.getElementById('in-monthly').value = vals.monthly;
+  document.getElementById('sl-monthly').value = vals.monthly;
+  document.getElementById('in-injection').value = vals.injection;
+  document.getElementById('sl-injection').value = vals.injection;
+  document.getElementById('in-rate').value = vals.rate;
+  document.getElementById('sl-rate').value = vals.rate;
+  document.getElementById('in-years').value = vals.years;
+  document.getElementById('sl-years').value = vals.years;
+  document.getElementById('in-wht').checked = !!vals.wht;
+  document.getElementById('in-target').value = vals.target;
+}
+
+async function saveInputsState() {
+  try {
+    if (window.storage) {
+      await window.storage.set('wealth-calc-inputs', JSON.stringify(readInputsFromDOM()), false);
+    }
+  } catch (e) { /* storage unavailable or write refused - continue silently */ }
+}
+
+async function loadInputsState() {
+  try {
+    if (window.storage) {
+      const res = await window.storage.get('wealth-calc-inputs', false);
+      if (res && res.value) {
+        applyInputsToDOM(JSON.parse(res.value));
+      }
+    }
+  } catch (e) { /* no saved state yet, or storage unavailable */ }
+}
+
+document.addEventListener('click', function(e) {
+  const cell = e.target.closest('td.chk-cell');
+  if (cell) {
+    const m = parseInt(cell.dataset.month);
+    if (tickedMonths.has(m)) tickedMonths.delete(m); else tickedMonths.add(m);
+    render();
+    saveTickState();
+    return;
+  }
+  const injBox = e.target.closest('.inj-tick-box');
+  if (injBox) {
+    const y = parseInt(injBox.dataset.year);
+    if (tickedYears.has(y)) tickedYears.delete(y); else tickedYears.add(y);
+    render();
+    saveTickState();
+    return;
+  }
+});
+
+document.getElementById('reset-tracker').addEventListener('click', function() {
+  if (confirm('Reset every ticked box on this tracker? This cannot be undone.')) {
+    tickedMonths.clear();
+    tickedYears.clear();
+    render();
+    saveTickState();
+  }
+});
+
+document.getElementById('reset-inputs').addEventListener('click', function() {
+  if (confirm("Reset Currency, Monthly Savings, Annual Injection, Interest Rate, Years, WHT and Target back to their defaults? Your ticked boxes won't be affected.")) {
+    applyInputsToDOM(DEFAULT_INPUTS);
+    render();
+    saveInputsState();
+  }
+});
+
+// Sync sliders <-> number inputs, and recalculate + persist on any change
+function link(numId, slId) {
+  const num = document.getElementById(numId);
+  const sl = document.getElementById(slId);
+  num.addEventListener('input', () => { sl.value = num.value; render(); saveInputsState(); });
+  sl.addEventListener('input', () => { num.value = sl.value; render(); saveInputsState(); });
+}
+link('in-monthly', 'sl-monthly');
+link('in-injection', 'sl-injection');
+link('in-rate', 'sl-rate');
+link('in-years', 'sl-years');
+document.getElementById('in-currency').addEventListener('change', () => { render(); saveInputsState(); });
+document.getElementById('in-wht').addEventListener('change', () => { render(); saveInputsState(); });
+document.getElementById('in-target').addEventListener('input', () => { render(); saveInputsState(); });
+
+(async function init() {
+  await loadInputsState();
+  await loadTickState();
+  render();
+})();
+</script>
+
+</body>
+</html>
