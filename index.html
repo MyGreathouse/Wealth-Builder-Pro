@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wealth Builder Pro</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B1830">
+<meta name="description" content="Self-contained savings and compound-interest calculator with live tickbox progress tracking, fiscal-year pro-rata targets, and multi-currency support.">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wealth Builder">
+<meta name="mobile-web-app-capable" content="yes">
 <style>
   :root {
     --navy: #0B1830;
@@ -343,8 +352,46 @@
     margin: 0 0 8px 0;
     color: var(--navy);
     font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
   }
   .tracker-heading span { color: var(--green); }
+  .quick-save-btn {
+    position: relative;
+    background: var(--navy);
+    color: var(--gold);
+    border: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .quick-save-btn:hover { background: var(--gold); color: var(--navy); }
+  .qs-feedback {
+    position: absolute;
+    top: -26px;
+    right: 0;
+    background: var(--navy);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .qs-feedback.show { opacity: 1; }
   .tick-note {
     font-size: 11px;
     color: var(--muted);
@@ -440,6 +487,26 @@
     cursor: pointer;
   }
   .reset-btn:hover { background: var(--navy); color: #fff; }
+  .backup-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .backup-btn {
+    flex: 1;
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+    padding: 9px 10px;
+  }
+  .backup-btn:hover { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+  .save-status {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 600;
+    margin: -6px 0 14px 2px;
+  }
+  .save-status.paused { color: #b3401a; }
 
   @media (max-width: 720px) {
     .inputs-panel { position: static; }
@@ -565,9 +632,130 @@
     .hero-value { font-size: 23px; }
     .inj-grid { grid-template-columns: 1fr; }
   }
+  /* ===== PIN Lock Overlay ===== */
+  .lock-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--navy);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .lock-overlay.hidden { display: none; }
+  .lock-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 32px 28px;
+    max-width: 320px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  }
+  .lock-icon { font-size: 34px; margin-bottom: 10px; }
+  .lock-card h2 {
+    font-family: 'Liberation Serif', Georgia, serif;
+    color: var(--navy);
+    margin: 0 0 8px 0;
+    font-size: 19px;
+  }
+  .lock-subtitle {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 0 0 18px 0;
+    line-height: 1.5;
+  }
+  .lock-input {
+    width: 100%;
+    text-align: center;
+    font-size: 26px;
+    letter-spacing: 10px;
+    padding: 10px 40px 10px 0;
+    border: 1.5px solid #d8d0ba;
+    border-radius: 6px;
+    font-family: 'Liberation Sans', Arial, sans-serif;
+    color: var(--navy);
+    text-transform: uppercase;
+  }
+  .lock-input:focus { outline: none; border-color: var(--gold); }
+  .lock-input::placeholder {
+    letter-spacing: 2px;
+    font-size: 13px;
+    text-transform: none;
+    color: #aaa;
+  }
+  .lock-input-wrap {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .lock-input-wrap .lock-input { margin-bottom: 0; }
+  .lock-eye-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 6px;
+    line-height: 1;
+    opacity: 0.6;
+  }
+  .lock-eye-btn:hover { opacity: 1; }
+  .lock-error {
+    color: #b3401a;
+    font-size: 12px;
+    font-weight: 600;
+    min-height: 16px;
+    margin-bottom: 10px;
+  }
+  .lock-submit-btn {
+    width: 100%;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    padding: 11px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .lock-submit-btn:hover { background: var(--gold); color: var(--navy); }
+  .lock-forgot {
+    margin-top: 14px;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .lock-forgot a { color: var(--navy); font-weight: 700; text-decoration: underline; cursor: pointer; }
 </style>
 </head>
 <body>
+
+<div id="lock-overlay" class="lock-overlay">
+  <div class="lock-card">
+    <div class="lock-icon">&#128274;</div>
+    <h2 id="lock-title">Enter PIN</h2>
+    <p id="lock-subtitle" class="lock-subtitle">Enter your 4-character PIN to unlock Wealth Builder Pro.</p>
+
+    <div class="lock-input-wrap">
+      <input type="password" id="lock-input" class="lock-input" maxlength="4" autocomplete="off" inputmode="text" placeholder="&#8226;&#8226;&#8226;&#8226;">
+      <button type="button" class="lock-eye-btn" id="lock-eye-toggle" aria-label="Show PIN" title="Show PIN">&#128065;</button>
+    </div>
+    <div class="lock-input-wrap" id="lock-confirm-wrap" style="display:none;">
+      <input type="password" id="lock-confirm-input" class="lock-input" maxlength="4" autocomplete="off" inputmode="text" placeholder="Confirm PIN">
+      <button type="button" class="lock-eye-btn" id="lock-confirm-eye-toggle" aria-label="Show PIN" title="Show PIN">&#128065;</button>
+    </div>
+
+    <div id="lock-error" class="lock-error"></div>
+
+    <button id="lock-submit" class="lock-submit-btn">Unlock</button>
+
+    <div id="lock-forgot" class="lock-forgot">Forgot your PIN? <a href="#" id="lock-forgot-link">Reset it</a></div>
+  </div>
+</div>
 
 <div class="header">
   <div class="pill">Master Plan &middot; Interactive Calculator</div>
@@ -582,6 +770,24 @@
       <h2 style="margin:0; border:none; padding:0;">Your Inputs</h2>
       <button class="reset-btn" id="reset-inputs">Reset to Defaults</button>
     </div>
+
+    <div class="backup-row">
+      <button class="reset-btn backup-btn" id="lock-now-btn">&#128274; Lock Now</button>
+      <button class="reset-btn backup-btn" id="change-pin-btn">Change PIN</button>
+    </div>
+
+    <div class="backup-row">
+      <button class="reset-btn backup-btn" id="export-progress">&#8595; Save Progress File</button>
+      <button class="reset-btn backup-btn" id="import-progress">&#8593; Load Progress File</button>
+      <input type="file" id="import-file-input" accept="application/json" style="display:none;">
+    </div>
+    <div class="note" style="margin-top:2px; margin-bottom:14px;">Auto-save works while you stay on this page, but can be unreliable when this file is reopened fresh (e.g. tapped from a chat or file manager). Save a progress file whenever you make real changes, and load it back on any device to pick up exactly where you left off.</div>
+
+    <div class="toggle-row" id="save-toggle-row">
+      <input type="checkbox" id="save-toggle" checked>
+      <label for="save-toggle">Save my progress on this device, so it's still here when I come back</label>
+    </div>
+    <div class="save-status" id="save-status-note">Saving is on &mdash; nothing saved yet this visit.</div>
 
     <div class="field">
       <label>Base Currency</label>
@@ -743,7 +949,7 @@
         </div>
       </div>
 
-      <h4 class="tracker-heading">Monthly Savings Tracker &mdash; <span id="box-value-monthly">&#8358;200,000</span> per box</h4>
+      <h4 class="tracker-heading">Monthly Savings Tracker &mdash; <span id="box-value-monthly">&#8358;200,000</span> per box <button class="quick-save-btn" onclick="quickSave(this)" title="Save now" aria-label="Save now">&#128190;<span class="qs-feedback"></span></button></h4>
       <div class="table-scroll">
         <table class="tick-grid" id="monthly-grid">
           <thead>
@@ -757,7 +963,7 @@
         </table>
       </div>
 
-      <h4 class="tracker-heading" style="margin-top:18px;">January Injection Tracker &mdash; <span id="box-value-injection">&#8358;5,000,000</span> per box</h4>
+      <h4 class="tracker-heading" style="margin-top:18px;">January Injection Tracker &mdash; <span id="box-value-injection">&#8358;5,000,000</span> per box <button class="quick-save-btn" onclick="quickSave(this)" title="Save now" aria-label="Save now">&#128190;<span class="qs-feedback"></span></button></h4>
       <div class="inj-grid" id="injection-grid-body"></div>
 
       <div class="tick-note">Tick a box the moment that deposit clears in real life. Every input on this page &mdash; your ticks, currency, monthly amount, injection, rate, years, WHT toggle and target &mdash; is saved automatically and restored the next time you open this tool, until you use one of the Reset buttons above.</div>
@@ -1256,27 +1462,90 @@ function updateLiveProjection() {
   }
 }
 
-async function saveTickState() {
+// ===== Universal persistence layer =====
+// Uses Claude's window.storage when this runs inside Claude's environment; falls back to
+// the browser's own localStorage everywhere else (i.e. once this is deployed as a standalone
+// site on GitHub Pages / Vercel / your own domain). Either way, the app keeps working the
+// same way: your ticks and settings are remembered between visits until you hit Reset.
+async function storageGet(key) {
   try {
     if (window.storage) {
-      await window.storage.set('wealth-tracker-ticks', JSON.stringify({
-        months: [...tickedMonths], years: [...tickedYears]
-      }), false);
+      const res = await window.storage.get(key, false);
+      return res ? res.value : null;
     }
-  } catch (e) { /* storage unavailable or write refused - continue silently */ }
+  } catch (e) { /* fall through to localStorage */ }
+  try {
+    if (window.localStorage) {
+      return window.localStorage.getItem(key);
+    }
+  } catch (e) { /* localStorage unavailable (e.g. private browsing) - continue silently */ }
+  return null;
+}
+
+async function storageSet(key, value) {
+  try {
+    if (window.storage) {
+      await window.storage.set(key, value, false);
+      return;
+    }
+  } catch (e) { /* fall through to localStorage */ }
+  try {
+    if (window.localStorage) {
+      window.localStorage.setItem(key, value);
+    }
+  } catch (e) { /* localStorage unavailable (e.g. private browsing) - continue silently */ }
+}
+
+let autoSaveEnabled = true;
+
+function formatTimeNow() {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function setSaveStatus(text, paused) {
+  const el = document.getElementById('save-status-note');
+  if (!el) return;
+  el.textContent = text;
+  el.classList.toggle('paused', !!paused);
+}
+
+// Quick-save buttons next to the Monthly / January tracker headings. Forces an immediate
+// save regardless of the auto-save toggle, since a deliberate tap should always save.
+async function quickSave(btn) {
+  const wasEnabled = autoSaveEnabled;
+  autoSaveEnabled = true;
+  await saveInputsState();
+  await saveTickState();
+  autoSaveEnabled = wasEnabled;
+  if (!wasEnabled) {
+    setSaveStatus('Saving paused \u2014 changes made now will NOT be kept when you leave.', true);
+  }
+
+  const feedback = btn.querySelector('.qs-feedback');
+  if (feedback) {
+    feedback.textContent = 'Saved!';
+    feedback.classList.add('show');
+    setTimeout(() => feedback.classList.remove('show'), 1400);
+  }
+}
+
+async function saveTickState() {
+  if (!autoSaveEnabled) return;
+  await storageSet('wealth-tracker-ticks', JSON.stringify({
+    months: [...tickedMonths], years: [...tickedYears]
+  }));
+  setSaveStatus('\u2713 Saved at ' + formatTimeNow());
 }
 
 async function loadTickState() {
-  try {
-    if (window.storage) {
-      const res = await window.storage.get('wealth-tracker-ticks', false);
-      if (res && res.value) {
-        const parsed = JSON.parse(res.value);
-        (parsed.months || []).forEach(m => tickedMonths.add(m));
-        (parsed.years || []).forEach(y => tickedYears.add(y));
-      }
-    }
-  } catch (e) { /* no saved state yet, or storage unavailable */ }
+  const value = await storageGet('wealth-tracker-ticks');
+  if (value) {
+    try {
+      const parsed = JSON.parse(value);
+      (parsed.months || []).forEach(m => tickedMonths.add(m));
+      (parsed.years || []).forEach(y => tickedYears.add(y));
+    } catch (e) { /* corrupted saved value - ignore and start fresh */ }
+  }
 }
 
 // ===== Persist the input panel itself (currency, monthly, injection, rate, years, WHT, target) =====
@@ -1311,22 +1580,18 @@ function applyInputsToDOM(vals) {
 }
 
 async function saveInputsState() {
-  try {
-    if (window.storage) {
-      await window.storage.set('wealth-calc-inputs', JSON.stringify(readInputsFromDOM()), false);
-    }
-  } catch (e) { /* storage unavailable or write refused - continue silently */ }
+  if (!autoSaveEnabled) return;
+  await storageSet('wealth-calc-inputs', JSON.stringify(readInputsFromDOM()));
+  setSaveStatus('\u2713 Saved at ' + formatTimeNow());
 }
 
 async function loadInputsState() {
-  try {
-    if (window.storage) {
-      const res = await window.storage.get('wealth-calc-inputs', false);
-      if (res && res.value) {
-        applyInputsToDOM(JSON.parse(res.value));
-      }
-    }
-  } catch (e) { /* no saved state yet, or storage unavailable */ }
+  const value = await storageGet('wealth-calc-inputs');
+  if (value) {
+    try {
+      applyInputsToDOM(JSON.parse(value));
+    } catch (e) { /* corrupted saved value - ignore and start fresh */ }
+  }
 }
 
 document.addEventListener('click', function(e) {
@@ -1365,6 +1630,54 @@ document.getElementById('reset-inputs').addEventListener('click', function() {
   }
 });
 
+// ===== Manual backup / restore (works regardless of browser storage quirks) =====
+document.getElementById('export-progress').addEventListener('click', function() {
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    inputs: readInputsFromDOM(),
+    ticks: { months: [...tickedMonths], years: [...tickedYears] }
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `wealth-builder-pro-progress-${dateStr}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('import-progress').addEventListener('click', function() {
+  document.getElementById('import-file-input').click();
+});
+
+document.getElementById('import-file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function() {
+    try {
+      const payload = JSON.parse(reader.result);
+      if (!payload.inputs) throw new Error('Not a recognised progress file');
+      applyInputsToDOM(payload.inputs);
+      tickedMonths.clear();
+      tickedYears.clear();
+      ((payload.ticks && payload.ticks.months) || []).forEach(m => tickedMonths.add(m));
+      ((payload.ticks && payload.ticks.years) || []).forEach(y => tickedYears.add(y));
+      render();
+      saveInputsState();
+      saveTickState();
+      alert('Progress loaded successfully.');
+    } catch (err) {
+      alert("Couldn't read that file - make sure it's a progress file saved from this tool.");
+    }
+    e.target.value = ''; // allow re-selecting the same file later
+  };
+  reader.readAsText(file);
+});
+
 // Sync sliders <-> number inputs, and recalculate + persist on any change
 function link(numId, slId) {
   const num = document.getElementById(numId);
@@ -1380,11 +1693,180 @@ document.getElementById('in-currency').addEventListener('change', () => { render
 document.getElementById('in-wht').addEventListener('change', () => { render(); saveInputsState(); });
 document.getElementById('in-target').addEventListener('input', () => { render(); saveInputsState(); });
 
+document.getElementById('save-toggle').addEventListener('change', function() {
+  autoSaveEnabled = this.checked;
+  if (autoSaveEnabled) {
+    saveInputsState();
+    saveTickState();
+  } else {
+    setSaveStatus('Saving paused \u2014 changes made now will NOT be kept when you leave.', true);
+  }
+});
+
 (async function init() {
   await loadInputsState();
   await loadTickState();
   render();
+  const hadSavedData = (await storageGet('wealth-calc-inputs')) || (await storageGet('wealth-tracker-ticks'));
+  setSaveStatus(hadSavedData ? '\u2713 Restored your last saved progress.' : 'Saving is on \u2014 nothing saved yet this visit.');
 })();
+
+// ===== PIN Lock (local device lock, not real authentication) =====
+// This is a casual privacy lock, not real security: the PIN is stored on this device and
+// checked entirely in the browser, so anyone with developer tools could bypass it. It's meant
+// to stop a passer-by glancing at your phone from seeing your numbers, not a determined attacker.
+let pinMode = 'unlock'; // 'unlock' | 'setup' | 'change'
+const PIN_REGEX = /^[A-Za-z0-9]{4}$/;
+
+function showLockUI() {
+  const title = document.getElementById('lock-title');
+  const subtitle = document.getElementById('lock-subtitle');
+  const input = document.getElementById('lock-input');
+  const confirmInput = document.getElementById('lock-confirm-input');
+  const confirmWrap = document.getElementById('lock-confirm-wrap');
+  const forgot = document.getElementById('lock-forgot');
+  const submitBtn = document.getElementById('lock-submit');
+  const overlay = document.getElementById('lock-overlay');
+
+  document.getElementById('lock-error').textContent = '';
+  input.value = '';
+  confirmInput.value = '';
+  // Always re-mask on a fresh screen, regardless of what the eye toggle left it as last time.
+  input.type = 'password';
+  confirmInput.type = 'password';
+  document.getElementById('lock-eye-toggle').textContent = '\u{1F441}\uFE0F';
+  document.getElementById('lock-confirm-eye-toggle').textContent = '\u{1F441}\uFE0F';
+
+  if (pinMode === 'setup') {
+    title.textContent = 'Set a PIN';
+    subtitle.textContent = 'Choose a 4-character PIN (letters or numbers) to lock Wealth Builder Pro. It\'s stored only on this device \u2014 there\'s no way to recover it remotely, so remember it.';
+    input.placeholder = 'New PIN';
+    confirmInput.placeholder = 'Confirm PIN';
+    confirmWrap.style.display = 'block';
+    forgot.style.display = 'none';
+    submitBtn.textContent = 'Set PIN';
+  } else if (pinMode === 'change') {
+    title.textContent = 'Change Your PIN';
+    subtitle.textContent = 'Choose a new 4-character PIN.';
+    input.placeholder = 'New PIN';
+    confirmInput.placeholder = 'Confirm PIN';
+    confirmWrap.style.display = 'block';
+    forgot.style.display = 'none';
+    submitBtn.textContent = 'Save New PIN';
+  } else {
+    title.textContent = 'Enter PIN';
+    subtitle.textContent = 'Enter your 4-character PIN to unlock Wealth Builder Pro.';
+    input.placeholder = '\u2022\u2022\u2022\u2022';
+    confirmWrap.style.display = 'none';
+    forgot.style.display = 'block';
+    submitBtn.textContent = 'Unlock';
+  }
+
+  overlay.classList.remove('hidden');
+  setTimeout(() => input.focus(), 50);
+}
+
+function hideLockUI() {
+  document.getElementById('lock-overlay').classList.add('hidden');
+}
+
+async function handleLockSubmit() {
+  const input = document.getElementById('lock-input');
+  const confirmInput = document.getElementById('lock-confirm-input');
+  const errorEl = document.getElementById('lock-error');
+  const val = input.value.trim();
+
+  if (pinMode === 'unlock') {
+    const storedPin = await storageGet('wealth-builder-pin');
+    if (val && val.toUpperCase() === (storedPin || '').toUpperCase()) {
+      hideLockUI();
+    } else {
+      errorEl.textContent = 'Incorrect PIN. Try again.';
+      input.value = '';
+      input.focus();
+    }
+    return;
+  }
+
+  // setup or change mode
+  if (!PIN_REGEX.test(val)) {
+    errorEl.textContent = 'PIN must be exactly 4 letters or numbers.';
+    return;
+  }
+  const confirmVal = confirmInput.value.trim();
+  if (val.toUpperCase() !== confirmVal.toUpperCase()) {
+    errorEl.textContent = "PINs don't match. Try again.";
+    confirmInput.value = '';
+    confirmInput.focus();
+    return;
+  }
+  await storageSet('wealth-builder-pin', val.toUpperCase());
+  hideLockUI();
+}
+
+document.getElementById('lock-submit').addEventListener('click', handleLockSubmit);
+document.getElementById('lock-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    if (document.getElementById('lock-confirm-wrap').style.display !== 'none') {
+      document.getElementById('lock-confirm-input').focus();
+    } else {
+      handleLockSubmit();
+    }
+  }
+});
+document.getElementById('lock-confirm-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') handleLockSubmit();
+});
+
+function toggleLockEye(inputId, btnEl) {
+  const input = document.getElementById(inputId);
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  btnEl.textContent = showing ? '\u{1F441}\uFE0F' : '\u{1F576}\uFE0F';
+  btnEl.title = showing ? 'Show PIN' : 'Hide PIN';
+  input.focus();
+}
+document.getElementById('lock-eye-toggle').addEventListener('click', function() {
+  toggleLockEye('lock-input', this);
+});
+document.getElementById('lock-confirm-eye-toggle').addEventListener('click', function() {
+  toggleLockEye('lock-confirm-input', this);
+});
+
+document.getElementById('lock-forgot-link').addEventListener('click', async function(e) {
+  e.preventDefault();
+  if (confirm("Reset your PIN? This only removes the lock \u2014 your saved financial data and progress will NOT be affected. You'll be asked to set a new PIN.")) {
+    await storageSet('wealth-builder-pin', '');
+    pinMode = 'setup';
+    showLockUI();
+  }
+});
+
+document.getElementById('lock-now-btn').addEventListener('click', function() {
+  pinMode = 'unlock';
+  showLockUI();
+});
+
+document.getElementById('change-pin-btn').addEventListener('click', function() {
+  pinMode = 'change';
+  showLockUI();
+});
+
+(async function initLock() {
+  const storedPin = await storageGet('wealth-builder-pin');
+  pinMode = storedPin ? 'unlock' : 'setup';
+  showLockUI();
+})();
+
+// Register the service worker so the app installs as a home-screen/desktop app and keeps
+// working offline after the first visit. Silently does nothing if served from somewhere
+// that doesn't support it (e.g. a plain local double-clicked file) - the calculator itself
+// still works fine either way, this only affects installability and offline caching.
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => { /* not served over http(s) - skip */ });
+  });
+}
 </script>
 
 </body>
