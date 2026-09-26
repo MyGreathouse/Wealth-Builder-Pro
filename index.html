@@ -500,6 +500,53 @@
     padding: 9px 10px;
   }
   .backup-btn:hover { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+
+  .pin-promo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #fff6e8, var(--gold-soft));
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .pin-promo-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .pin-promo-text { flex: 1; min-width: 0; }
+  .pin-promo-title {
+    font-family: 'Liberation Serif', Georgia, serif;
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--navy);
+    margin-bottom: 3px;
+  }
+  .pin-promo-sub {
+    font-size: 11.5px;
+    color: #6a5c3a;
+    line-height: 1.4;
+  }
+  .pin-promo-btn {
+    background: var(--navy);
+    color: var(--gold);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .pin-promo-btn:hover { background: var(--gold); color: var(--navy); }
+
+  @media (max-width: 480px) {
+    .pin-promo { flex-wrap: wrap; }
+    .pin-promo-btn { width: 100%; }
+  }
   .save-status {
     font-size: 11px;
     color: var(--green);
@@ -730,11 +777,22 @@
     color: var(--muted);
   }
   .lock-forgot a { color: var(--navy); font-weight: 700; text-decoration: underline; cursor: pointer; }
+  .lock-skip {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+  .lock-skip a {
+    color: var(--muted);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .lock-skip a:hover { color: var(--navy); text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<div id="lock-overlay" class="lock-overlay">
+<div id="lock-overlay" class="lock-overlay hidden">
   <div class="lock-card">
     <div class="lock-icon">&#128274;</div>
     <h2 id="lock-title">Enter PIN</h2>
@@ -754,6 +812,7 @@
     <button id="lock-submit" class="lock-submit-btn">Unlock</button>
 
     <div id="lock-forgot" class="lock-forgot">Forgot your PIN? <a href="#" id="lock-forgot-link">Reset it</a></div>
+    <div id="lock-skip" class="lock-skip"><a href="#" id="lock-skip-link">Skip for now &rarr;</a></div>
   </div>
 </div>
 
@@ -771,7 +830,16 @@
       <button class="reset-btn" id="reset-inputs">Reset to Defaults</button>
     </div>
 
-    <div class="backup-row">
+    <div class="pin-promo" id="pin-promo" style="display:none;">
+      <div class="pin-promo-icon">&#128274;</div>
+      <div class="pin-promo-text">
+        <div class="pin-promo-title">Add a Lock PIN</div>
+        <div class="pin-promo-sub">Optional, but recommended if you share this device &mdash; keeps your numbers private with a quick 4-character PIN.</div>
+      </div>
+      <button class="pin-promo-btn" id="pin-promo-btn">Set Up PIN</button>
+    </div>
+
+    <div class="backup-row" id="pin-manage-row">
       <button class="reset-btn backup-btn" id="lock-now-btn">&#128274; Lock Now</button>
       <button class="reset-btn backup-btn" id="change-pin-btn">Change PIN</button>
     </div>
@@ -1725,6 +1793,7 @@ function showLockUI() {
   const confirmInput = document.getElementById('lock-confirm-input');
   const confirmWrap = document.getElementById('lock-confirm-wrap');
   const forgot = document.getElementById('lock-forgot');
+  const skipLink = document.getElementById('lock-skip-link');
   const submitBtn = document.getElementById('lock-submit');
   const overlay = document.getElementById('lock-overlay');
 
@@ -1745,6 +1814,7 @@ function showLockUI() {
     confirmWrap.style.display = 'block';
     forgot.style.display = 'none';
     submitBtn.textContent = 'Set PIN';
+    skipLink.textContent = 'Skip for now \u2192';
   } else if (pinMode === 'change') {
     title.textContent = 'Change Your PIN';
     subtitle.textContent = 'Choose a new 4-character PIN.';
@@ -1753,6 +1823,7 @@ function showLockUI() {
     confirmWrap.style.display = 'block';
     forgot.style.display = 'none';
     submitBtn.textContent = 'Save New PIN';
+    skipLink.textContent = 'Cancel';
   } else {
     title.textContent = 'Enter PIN';
     subtitle.textContent = 'Enter your 4-character PIN to unlock Wealth Builder Pro.';
@@ -1760,6 +1831,7 @@ function showLockUI() {
     confirmWrap.style.display = 'none';
     forgot.style.display = 'block';
     submitBtn.textContent = 'Unlock';
+    skipLink.textContent = 'Skip for now \u2192';
   }
 
   overlay.classList.remove('hidden');
@@ -1802,6 +1874,7 @@ async function handleLockSubmit() {
   }
   await storageSet('wealth-builder-pin', val.toUpperCase());
   hideLockUI();
+  updatePinPromoUI();
 }
 
 document.getElementById('lock-submit').addEventListener('click', handleLockSubmit);
@@ -1835,11 +1908,18 @@ document.getElementById('lock-confirm-eye-toggle').addEventListener('click', fun
 
 document.getElementById('lock-forgot-link').addEventListener('click', async function(e) {
   e.preventDefault();
-  if (confirm("Reset your PIN? This only removes the lock \u2014 your saved financial data and progress will NOT be affected. You'll be asked to set a new PIN.")) {
+  if (confirm("Reset your PIN? This only removes the lock \u2014 your saved financial data and progress will NOT be affected. You can set a new PIN any time from inside the app.")) {
     await storageSet('wealth-builder-pin', '');
-    pinMode = 'setup';
-    showLockUI();
+    hideLockUI();
+    updatePinPromoUI();
   }
+});
+
+document.getElementById('lock-skip-link').addEventListener('click', function(e) {
+  e.preventDefault();
+  // Just closes the lock screen for now - doesn't touch any PIN that's set, and doesn't
+  // set one either if this was the setup screen. The PIN lock is entirely optional.
+  hideLockUI();
 });
 
 document.getElementById('lock-now-btn').addEventListener('click', function() {
@@ -1852,10 +1932,37 @@ document.getElementById('change-pin-btn').addEventListener('click', function() {
   showLockUI();
 });
 
+document.getElementById('pin-promo-btn').addEventListener('click', function() {
+  pinMode = 'setup';
+  showLockUI();
+});
+
+async function updatePinPromoUI() {
+  const storedPin = await storageGet('wealth-builder-pin');
+  const promo = document.getElementById('pin-promo');
+  const manageRow = document.getElementById('pin-manage-row');
+  if (storedPin) {
+    promo.style.display = 'none';
+    manageRow.style.display = 'flex';
+  } else {
+    promo.style.display = 'flex';
+    manageRow.style.display = 'none';
+  }
+}
+
+// A PIN is now entirely opt-in: first-time visitors (and anyone who never set one) go
+// straight into the app with no gate at all. The lock screen only appears automatically for
+// someone who has already chosen to set a PIN on this device. Setting one up is handled by
+// the prominent "Add a Lock PIN" banner inside the app instead of a forced first-visit screen.
 (async function initLock() {
   const storedPin = await storageGet('wealth-builder-pin');
-  pinMode = storedPin ? 'unlock' : 'setup';
-  showLockUI();
+  if (storedPin) {
+    pinMode = 'unlock';
+    showLockUI();
+  } else {
+    hideLockUI();
+  }
+  updatePinPromoUI();
 })();
 
 // Register the service worker so the app installs as a home-screen/desktop app and keeps
